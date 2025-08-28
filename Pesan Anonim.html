@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecretMessage - Anonymous Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-blue: #0d1b36;
+            --premium-blue: #1a2b4d;
+            --accent-blue: #2563eb;
+            --light-blue: #3b82f6;
+            --black: #000000;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-white: #ffffff;
+            --text-light: #d1d5db;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gradient-blue: linear-gradient(135deg, var(--accent-blue), var(--premium-blue));
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--black);
+            color: var(--text-white);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Login Section */
+        .login-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--dark-bg);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 20px;
+            border: 1px solid var(--premium-blue);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+
+        .app-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--gradient-blue);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .app-logo i {
+            font-size: 2.5rem;
+        }
+
+        .app-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: var(--gradient-blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .app-subtitle {
+            color: var(--text-light);
+            opacity: 0.8;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            opacity: 0.6;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid var(--premium-blue);
+            border-radius: 12px;
+            background: var(--dark-bg);
+            color: var(--text-white);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background: var(--gradient-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn i {
+            font-size: 1.1rem;
+        }
+
+        /* Main App */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            background: var(--dark-bg);
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--premium-blue);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--gradient-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            opacity: 0.7;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--premium-blue);
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        /* Content */
+        .content {
+            padding: 30px 0;
+        }
+
+        /* Dashboard */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: var(--gradient-blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--premium-blue);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--accent-blue);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            opacity: 0.7;
+        }
+
+        /* Message List */
+        .message-list {
+            margin: 25px 0;
+        }
+
+        .message-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-blue);
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .message-card:hover {
+            transform: translateX(5px);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .sender-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sender-icon {
+            color: var(--accent-blue);
+            font-size: 1.1rem;
+        }
+
+        .message-time {
+            color: var(--text-light);
+            opacity: 0.6;
+            font-size: 0.8rem;
+        }
+
+        .message-content {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+        }
+
+        .no-messages {
+            text-align: center;
+            color: var(--text-light);
+            opacity: 0.6;
+            padding: 50px 0;
+        }
+
+        .no-messages i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--premium-blue);
+            opacity: 0.5;
+        }
+
+        /* Send Message Section */
+        .send-section {
+            display: none;
+        }
+
+        .send-section.active {
+            display: block;
+        }
+
+        .send-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--premium-blue);
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .target-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--dark-bg);
+            border-radius: 12px;
+            border: 1px solid var(--premium-blue);
+        }
+
+        .target-icon {
+            color: var(--accent-blue);
+            font-size: 1.2rem;
+        }
+
+        .target-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .target-name {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 15px;
+            border: 2px solid var(--premium-blue);
+            border-radius: 12px;
+            background: var(--dark-bg);
+            color: var(--text-white);
+            font-size: 16px;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .success-message {
+            background: var(--success);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-message.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .login-card {
+                padding: 30px 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .user-info {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <section class="login-section" id="loginSection">
+        <div class="login-card">
+            <div class="app-logo">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h1 class="app-title">Ngl By ZalOfficial</h1>
+            <p class="app-subtitle">Kirim Pesan Anonim Sekarang Juga!</p>
+            
+            <div class="input-group">
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" id="usernameInput" placeholder="Username..." autocomplete="off">
+            </div>
+            
+            <button class="btn" onclick="login()">
+                <i class="fas fa-arrow-right"></i>
+                Continue
+            </button>
+        </div>
+    </section>
+    <div class="app-container" id="appContainer">
+        <header class="header">
+            <div class="container header-content">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <span class="username" id="userName">User</span>
+                        <span class="user-role" id="userRole">Guest</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </header>
+        <div class="content">
+            <div class="container">
+                <div class="dashboard-section" id="dashboardSection">
+                    <div class="section-header">
+                        <h2 class="section-title"> Dashboard ZalOfficial</h2>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-envelope stat-icon"></i>
+                            <div class="stat-number" id="totalMessages">0</div>
+                            <div class="stat-label">Total Pesan</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-eye-slash stat-icon"></i>
+                            <div class="stat-number" id="unreadMessages">0</div>
+                            <div class="stat-label">Unread</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-day stat-icon"></i>
+                            <div class="stat-number" id="todayMessages">0</div>
+                            <div class="stat-label">Today</div>
+                        </div>
+                    </div>
+
+                    <div class="message-list" id="messageList">
+                        <div class="no-messages">
+                            <i class="fas fa-inbox"></i>
+                            <p>Tidak Ada Pesan</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="send-section" id="sendSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Developer ZalOfficial</h2>
+                    </div>
+
+                    <div class="send-card">
+                        <div class="target-info">
+                            <i class="fas fa-paper-plane target-icon"></i>
+                            <span class="target-text">Kirim Ke:</span>
+                            <span class="target-name">ZalOfficial</span>
+                        </div>
+
+                        <textarea id="messageInput" placeholder="Write your anonymous message here..."></textarea>
+                        
+                        <button class="btn" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                            Kirim Pesan
+                        </button>
+                        
+                        <div class="success-message" id="successMessage">
+                            <i class="fas fa-check-circle"></i>
+                            Pesan Kamu Sukses Di Kirim
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const TARGET_USER = 'ZalOfficial';
+        let currentUser = '';
+        let messages = JSON.parse(localStorage.getItem('zalstexcu_messages') || '[]');
+
+        // Login function
+        function login() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) {
+                alert('Please enter a username!');
+                return;
+            }
+
+            currentUser = username;
+            
+            // Update UI
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('appContainer').classList.add('active');
+            document.getElementById('userAvatar').textContent = username.charAt(0).toUpperCase();
+            document.getElementById('userName').textContent = username;
+
+            // Check if user is ZalOfficial
+            if (username.toLowerCase() === TARGET_USER.toLowerCase()) {
+                document.getElementById('userRole').textContent = 'Message Receiver';
+                document.getElementById('dashboardSection').classList.add('active');
+                document.getElementById('sendSection').classList.remove('active');
+                loadDashboard();
+            } else {
+                document.getElementById('userRole').textContent = 'Message Sender';
+                document.getElementById('dashboardSection').classList.remove('active');
+                document.getElementById('sendSection').classList.add('active');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            currentUser = '';
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('usernameInput').value = '';
+            document.getElementById('usernameInput').focus();
+        }
+
+        // Send message function
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                alert('Please write a message first!');
+                return;
+            }
+
+            // Create new message
+            const newMessage = {
+                id: Date.now(),
+                text: message,
+                sender: currentUser,
+                timestamp: new Date().toLocaleString('id-ID'),
+                read: false
+            };
+
+            // Add to messages array
+            messages.push(newMessage);
+            localStorage.setItem('zalstexcu_messages', JSON.stringify(messages));
+
+            // Show success
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.add('active');
+            messageInput.value = '';
+
+            // Hide success after 3 seconds
+            setTimeout(() => {
+                successMessage.classList.remove('active');
+            }, 3000);
+        }
+
+        // Load dashboard for ZalOfficial
+        function loadDashboard() {
+            updateStats();
+            loadMessages();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = messages.length;
+            const unread = messages.filter(msg => !msg.read).length;
+            const today = messages.filter(msg => {
+                const msgDate = new Date(msg.id).toDateString();
+                return msgDate === new Date().toDateString();
+            }).length;
+
+            document.getElementById('totalMessages').textContent = total;
+            document.getElementById('unreadMessages').textContent = unread;
+            document.getElementById('todayMessages').textContent = today;
+        }
+
+        // Load messages
+        function loadMessages() {
+            const messageList = document.getElementById('messageList');
+            
+            if (messages.length === 0) {
+                messageList.innerHTML = `
+                    <div class="no-messages">
+                        <i class="fas fa-inbox"></i>
+                        <p>No messages yet</p>
+                        <p style="font-size: 0.9rem; margin-top: 5px;">Share your profile to receive messages</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Display messages in reverse order (newest first)
+            messageList.innerHTML = messages.reverse().map(msg => `
+                <div class="message-card">
+                    <button class="delete-btn" onclick="deleteMessage(${msg.id})">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                    </button>
+                    <div class="message-header">
+                        <div class="sender-info">
+                            <i class="fas fa-user-secret sender-icon"></i>
+                            <span style="color: var(--text-light); font-size: 0.9rem;">Anonymous User</span>
+                        </div>
+                        <span class="message-time">${msg.timestamp}</span>
+                    </div>
+                    <div class="message-content">${msg.text}</div>
+                </div>
+            `).join('');
+
+            messages.forEach(msg => msg.read = true);
+            localStorage.setItem('zalstexcu_messages', JSON.stringify(messages));
+            updateStats();
+        }
+        function deleteMessage(id) {
+            messages = messages.filter(msg => msg.id !== id);
+            localStorage.setItem('zalstexcu_messages', JSON.stringify(messages));
+            loadMessages();
+            updateStats();
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add sample messages if empty
+            if (messages.length === 0) {
+                messages = [
+                    {
+                        id: Date.now() - 86400000,
+                        text: "Welcome to SecretMessage! This is a sample message to show how the system works.",
+                        sender: "system",
+                        timestamp: new Date(Date.now() - 86400000).toLocaleString('id-ID'),
+                        read: true
+                    },
+                    {
+                        id: Date.now() - 43200000,
+                        text: "Your profile looks great! This platform is perfect for receiving honest feedback anonymously.",
+                        sender: "feedback_user",
+                        timestamp: new Date(Date.now() - 43200000).toLocaleString('id-ID'),
+                        read: true
+                    }
+                ];
+                localStorage.setItem('zalstexcu_messages', JSON.stringify(messages));
+            }
+            document.getElementById('usernameInput').focus();
+            
+            // Enter key to login
+            document.getElementById('usernameInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
