@@ -771,26 +771,7 @@ messageList.innerHTML = messages.reverse().map(msg => `
             updateStats();
         }
         document.addEventListener('DOMContentLoaded', function() {
-            // Add sample messages if empty
-            if (messages.length === 0) {
-                messages = [
-                    {
-                        id: Date.now() - 86400000,
-                        text: "Welcome to SecretMessage! This is a sample message to show how the system works.",
-                        sender: "system",
-                        timestamp: new Date(Date.now() - 86400000).toLocaleString('id-ID'),
-                        read: true
-                    },
-                    {
-                        id: Date.now() - 43200000,
-                        text: "Your profile looks great! This platform is perfect for receiving honest feedback anonymously.",
-                        sender: "feedback_user",
-                        timestamp: new Date(Date.now() - 43200000).toLocaleString('id-ID'),
-                        read: true
-                    }
-                ];
-                localStorage.setItem('zalstexcu_messages', JSON.stringify(messages));
-            }
+            
             document.getElementById('usernameInput').focus();
             
             // Enter key to login
